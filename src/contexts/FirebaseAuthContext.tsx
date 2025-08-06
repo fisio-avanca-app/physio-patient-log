@@ -1,7 +1,15 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { 
+  signInWithEmailAndPassword, 
+  signOut, 
+  onAuthStateChanged,
+  User 
+} from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 interface AuthContextType {
   isAuthenticated: boolean;
+  user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   loading: boolean;
@@ -18,35 +26,39 @@ export const useAuth = () => {
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Verifica se existe autenticação salva no localStorage
-    const savedAuth = localStorage.getItem('fisio-auth');
-    if (savedAuth === 'true') {
-      setIsAuthenticated(true);
-    }
-    setLoading(false);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    // Por enquanto, login simples - depois integrar com Firebase
-    if (email === 'fisio@email.com' && password === '123456') {
-      setIsAuthenticated(true);
-      localStorage.setItem('fisio-auth', 'true');
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
       return true;
+    } catch (error) {
+      console.error('Erro no login:', error);
+      return false;
     }
-    return false;
   };
 
-  const logout = () => {
-    setIsAuthenticated(false);
-    localStorage.removeItem('fisio-auth');
+  const logout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Erro no logout:', error);
+    }
   };
 
   const value = {
-    isAuthenticated,
+    isAuthenticated: !!user,
+    user,
     login,
     logout,
     loading

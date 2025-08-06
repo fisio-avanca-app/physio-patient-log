@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Layout } from '@/components/Layout';
+import { FirebaseSetup } from '@/components/FirebaseSetup';
 import { PatientCard } from '@/components/PatientCard';
 import { PatientForm } from '@/components/PatientForm';
-import { usePatients } from '@/hooks/usePatients';
+import { useFirebasePatients } from '@/hooks/useFirebasePatients';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,12 +11,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Plus, Search, Users, Calendar, TrendingUp } from 'lucide-react';
 import { Patient, CreatePatientData } from '@/types/patient';
-import { useEvolutions } from '@/hooks/useEvolutions';
+import { useFirebaseEvolutions } from '@/hooks/useFirebaseEvolutions';
 import { useToast } from '@/hooks/use-toast';
 
 export const Home: React.FC = () => {
-  const { patients, loading, addPatient, deletePatient } = usePatients();
-  const { evolutions } = useEvolutions();
+  const { patients, loading, addPatient, deletePatient } = useFirebasePatients();
+  const { evolutions } = useFirebaseEvolutions();
   const { toast } = useToast();
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -74,6 +75,7 @@ export const Home: React.FC = () => {
   return (
     <Layout>
       <div className="space-y-8">
+        <FirebaseSetup />
         {/* Header com estatísticas */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="bg-gradient-card shadow-card">

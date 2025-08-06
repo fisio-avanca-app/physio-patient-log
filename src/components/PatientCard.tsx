@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { User, Phone, Calendar, FileText, Trash2 } from 'lucide-react';
-import { useEvolutions } from '@/hooks/useEvolutions';
+import { useFirebaseEvolutions } from '@/hooks/useFirebaseEvolutions';
 
 interface PatientCardProps {
   patient: Patient;
@@ -13,7 +13,7 @@ interface PatientCardProps {
 }
 
 export const PatientCard: React.FC<PatientCardProps> = ({ patient, onView, onDelete }) => {
-  const { getEvolutionsByPatient } = useEvolutions();
+  const { getEvolutionsByPatient } = useFirebaseEvolutions();
   const evolutionsCount = getEvolutionsByPatient(patient.id).length;
   const lastEvolution = getEvolutionsByPatient(patient.id)[0];
 

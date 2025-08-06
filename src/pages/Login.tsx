@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -55,9 +55,9 @@ export const Login: React.FC = () => {
         <CardContent className="space-y-6">
           <Alert className="bg-accent/10 border-accent/20">
             <AlertDescription className="text-sm">
-              <strong>Login de teste:</strong><br />
-              Email: fisio@email.com<br />
-              Senha: 123456
+              <strong>Configuração Firebase:</strong><br />
+              Configure suas credenciais Firebase em src/lib/firebase.ts<br />
+              Crie usuários no Firebase Console
             </AlertDescription>
           </Alert>
 

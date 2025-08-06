@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
-import { usePatients } from '@/hooks/usePatients';
-import { useEvolutions } from '@/hooks/useEvolutions';
+import { useFirebasePatients } from '@/hooks/useFirebasePatients';
+import { useFirebaseEvolutions } from '@/hooks/useFirebaseEvolutions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -18,8 +18,8 @@ import { useToast } from '@/hooks/use-toast';
 export const PatientDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getPatientById } = usePatients();
-  const { getEvolutionsByPatient, addEvolution, deleteEvolution } = useEvolutions();
+  const { getPatientById } = useFirebasePatients();
+  const { getEvolutionsByPatient, addEvolution, deleteEvolution } = useFirebaseEvolutions();
   const { toast } = useToast();
   const [showEvolutionForm, setShowEvolutionForm] = useState(false);
 
