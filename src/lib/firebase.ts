@@ -4,12 +4,13 @@ import { getFirestore } from 'firebase/firestore';
 
 // Configuração do Firebase - substitua pelos seus dados
 const firebaseConfig = {
-  apiKey: "demo-key",
-  authDomain: "fisioapp-demo.firebaseapp.com",
-  projectId: "fisioapp-demo",
-  storageBucket: "fisioapp-demo.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdef123456"
+ apiKey: "AIzaSyChvYxNaypLbUgX1lHfxH-0NIcZHo3yLAw",
+  authDomain: "fisioavanca.firebaseapp.com",
+  projectId: "fisioavanca",
+  storageBucket: "fisioavanca.firebasestorage.app",
+  messagingSenderId: "1014645267392",
+  appId: "1:1014645267392:web:23808e29a244b30ba68625",
+  measurementId: "G-NRS01N5F66"
 };
 
 // Inicializa Firebase

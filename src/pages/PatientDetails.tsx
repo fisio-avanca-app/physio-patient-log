@@ -263,3 +263,13 @@ export const PatientDetails: React.FC = () => {
     </Layout>
   );
 };
+
+/*
+campos faltantes:
+acs(agente comunitario de saude)
+endereço
+ponto de referência
+unidade de origem
+atendimento(ambulatorial ou domicilar)
+classificação de risco(eletivo, prioriatario ou urgente)
+ */

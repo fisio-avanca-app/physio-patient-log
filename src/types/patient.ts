@@ -23,6 +23,12 @@ export interface CreatePatientData {
   phone: string;
   email?: string;
   diagnosis: string;
+  sex: string
+  dateOfBirth: string,
+  cpf: string,
+  cns: string,
+  acs: string,
+  sourceUnit: string
 }
 
 export interface CreateEvolutionData {
