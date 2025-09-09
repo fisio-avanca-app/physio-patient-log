@@ -30,7 +30,7 @@ const AppContent = () => {
   }
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/physio-patient-log">
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/patient/:id" element={<PatientDetails />} />
