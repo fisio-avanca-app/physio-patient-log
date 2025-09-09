@@ -30,7 +30,7 @@ const AppContent = () => {
   }
 
   return (
-    <BrowserRouter basename="/physio-patient-log">
+    <BrowserRouter basename={import.meta.env.PROD ? "/physio-patient-log" : "/"}>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/patient/:id" element={<PatientDetails />} />
