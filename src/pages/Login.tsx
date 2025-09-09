@@ -53,14 +53,6 @@ export const Login: React.FC = () => {
         </CardHeader>
         
         <CardContent className="space-y-6">
-          <Alert className="bg-accent/10 border-accent/20">
-            <AlertDescription className="text-sm">
-              <strong>Configuração Firebase:</strong><br />
-              Configure suas credenciais Firebase em src/lib/firebase.ts<br />
-              Crie usuários no Firebase Console
-            </AlertDescription>
-          </Alert>
-
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email" className="flex items-center space-x-2">

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Layout } from '@/components/Layout';
-import { FirebaseSetup } from '@/components/FirebaseSetup';
 import { PatientCard } from '@/components/PatientCard';
 import { PatientForm } from '@/components/PatientForm';
 import { useFirebasePatients } from '@/hooks/useFirebasePatients';
@@ -75,7 +74,6 @@ export const Home: React.FC = () => {
   return (
     <Layout>
       <div className="space-y-8">
-        <FirebaseSetup />
         {/* Header com estatísticas */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="bg-gradient-card shadow-card">
