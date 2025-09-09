@@ -12,11 +12,12 @@ import { Plus, Search, Users, Calendar, TrendingUp } from 'lucide-react';
 import { Patient, CreatePatientData } from '@/types/patient';
 import { useFirebaseEvolutions } from '@/hooks/useFirebaseEvolutions';
 import { useToast } from '@/hooks/use-toast';
-
+import { useNavigate } from 'react-router-dom';
 export const Home: React.FC = () => {
   const { patients, loading, addPatient, deletePatient } = useFirebasePatients();
   const { evolutions } = useFirebaseEvolutions();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [deleteDialog, setDeleteDialog] = useState<Patient | null>(null);
@@ -46,7 +47,7 @@ export const Home: React.FC = () => {
 
   const handleViewPatient = (patient: Patient) => {
     // Navegar para página de detalhes do paciente
-    window.location.href = `/patient/${patient.id}`;
+    navigate(`/patient/${patient.id}`);
   };
 
   // Estatísticas
