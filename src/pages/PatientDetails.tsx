@@ -71,6 +71,11 @@ export const PatientDetails: React.FC = () => {
     });
   };
 
+  const formatDateBr = (dateString) => {
+  const [year, month, day] = dateString.split("-");
+  return `${day}/${month}/${year}`;
+};
+
   return (
     <Layout>
       <div className="space-y-6">
@@ -112,6 +117,67 @@ export const PatientDetails: React.FC = () => {
                 </p>
                 <p className="text-lg font-semibold text-foreground">{patient.phone}</p>
               </div>
+
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">Peso</p>
+                <p className="text-lg font-semibold text-foreground">{patient.weight} quilos</p>
+              </div>
+
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">Altura</p>
+                <p className="text-lg font-semibold text-foreground">{patient.height} m</p>
+              </div>
+
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">CPF</p>
+                <p className="text-lg font-semibold text-foreground">{patient.cpf} </p>
+              </div>
+
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">Data de Nascimento</p>
+                <p className="text-lg font-semibold text-foreground">{formatDateBr(patient.dateOfBirth)} </p>
+              </div>
+
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">Endereço</p>
+                <p className="text-lg font-semibold text-foreground">{patient.address} </p>
+              </div>
+
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">Ponto de Referência</p>
+                <p className="text-lg font-semibold text-foreground">{patient.referencePoint} </p>
+              </div>
+              
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">Unidade de Origem</p>
+                <p className="text-lg font-semibold text-foreground">{patient.sourceUnit} </p>
+              </div>
+
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">Agente Comunitário de Saúde</p>
+                <p className="text-lg font-semibold text-foreground">{patient.acs} </p>
+              </div>
+
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">Sexo</p>
+                <p className="text-lg font-semibold text-foreground">{patient.sex} </p>
+              </div>
+
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">Atendimento</p>
+                <p className="text-lg font-semibold text-foreground">{patient.service} </p>
+              </div>
+
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">Carteira Nacional de Saúde</p>
+                <p className="text-lg font-semibold text-foreground">{patient.cns} </p>
+              </div>
+
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">Classificação de Risco</p>
+                <p className="text-lg font-semibold text-foreground">{patient.riskRating} </p>
+              </div>
+              
               
               {patient.email && (
                 <div className="space-y-1">
@@ -264,12 +330,3 @@ export const PatientDetails: React.FC = () => {
   );
 };
 
-/*
-campos faltantes:
-acs(agente comunitario de saude)
-endereço
-ponto de referência
-unidade de origem
-atendimento(ambulatorial ou domicilar)
-classificação de risco(eletivo, prioriatario ou urgente)
- */

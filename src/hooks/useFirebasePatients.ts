@@ -42,7 +42,7 @@ export const useFirebasePatients = () => {
         createdAt: doc.data().createdAt?.toDate() || new Date(),
         updatedAt: doc.data().updatedAt?.toDate() || new Date()
       })) as Patient[];
-      
+      console.log(patientsData)
       setPatients(patientsData);
       setLoading(false);
     });

@@ -7,6 +7,18 @@ export interface Patient {
   diagnosis: string;
   createdAt: Date;
   updatedAt: Date;
+  weight: string,
+  height: string,
+  sourceUnit: string,
+  address: string, 
+  sex: string
+  dateOfBirth: string,
+  cpf: string,
+  cns: string,
+  acs: string,
+  referencePoint: string,
+  service: string,
+  riskRating: string,
 }
 
 export interface Evolution {
@@ -28,7 +40,14 @@ export interface CreatePatientData {
   cpf: string,
   cns: string,
   acs: string,
-  sourceUnit: string
+  sourceUnit: string,
+  address: string,  
+  referencePoint: string,
+  service: string,
+  riskRating: string,
+  weight: string,
+  height: string
+
 }
 
 export interface CreateEvolutionData {

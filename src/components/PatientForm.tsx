@@ -91,7 +91,7 @@ export const PatientForm: React.FC<PatientFormProps> = ({ onSubmit, onCancel }) 
             </div>
           </div>
 
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
            <div className="space-y-2">
               <Label htmlFor="sex">Sexo *</Label>
               <select
@@ -151,7 +151,7 @@ export const PatientForm: React.FC<PatientFormProps> = ({ onSubmit, onCancel }) 
             </div>
           </div>
 
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="acs">ACS *</Label>
               <Input
@@ -166,7 +166,7 @@ export const PatientForm: React.FC<PatientFormProps> = ({ onSubmit, onCancel }) 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="cpf">Unidade de Origem *</Label>
+              <Label htmlFor="sourceUnit">Unidade de Origem *</Label>
               <Input
                 id="sourceUnit"
                 type="sourceUnit"
@@ -178,6 +178,103 @@ export const PatientForm: React.FC<PatientFormProps> = ({ onSubmit, onCancel }) 
                 <p className="text-sm text-destructive">{errors.sourceUnit.message}</p>
               )}
             </div>
+          </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="weight">Peso *</Label>
+              <Input
+                id="weight"
+                {...register('weight', { required: 'Peso é obrigatório' })}
+                placeholder="Peso"
+                className="transition-all duration-300 focus:ring-2 focus:ring-primary/20"
+              />
+              {errors.weight && (
+                <p className="text-sm text-destructive">{errors.weight.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="height">Altura *</Label>
+              <Input
+                id="height"
+                type="height"
+                {...register('height', { required: 'Altura é obrigatório' })}
+                placeholder="Altura"
+                className="transition-all duration-300 focus:ring-2 focus:ring-primary/20"
+              />
+                {errors.height && (
+                <p className="text-sm text-destructive">{errors.height.message}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="address">Endereço *</Label>
+              <Input
+                id="address"
+                {...register('address', { required: 'Endereço é obrigatório' })}
+                placeholder="Endereço"
+                className="transition-all duration-300 focus:ring-2 focus:ring-primary/20"
+              />
+              {errors.address && (
+                <p className="text-sm text-destructive">{errors.address.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="referencePoint">Ponto de Referência *</Label>
+              <Input
+                id="referencePoint"
+                type="referencePoint"
+                {...register('referencePoint', { required: 'Ponto de Referência é obrigatório' })}
+                placeholder="Ponto de Referência"
+                className="transition-all duration-300 focus:ring-2 focus:ring-primary/20"
+              />
+                {errors.referencePoint && (
+                <p className="text-sm text-destructive">{errors.referencePoint.message}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+           <div className="space-y-2">
+              <Label htmlFor="service">Atendimento *</Label>
+              <select
+                id="service"
+                {...register('service', { required: 'Atendimento é obrigatório' })}
+                className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-300 focus:ring-primary/20"
+              >
+                <option value="service" disabled selected>
+                  Selecione o atendimento
+                </option>
+                <option value="ambulatorial">Ambulatorial</option>
+                <option value="domiciliar">Domiciliar</option>
+              </select>
+              {errors.service && (
+                <p className="text-sm text-destructive">{errors.service.message}</p>
+              )}
+          </div>
+
+ <div className="space-y-2">
+              <Label htmlFor="riskRating">Classificação de risco *</Label>
+              <select
+                id="riskRating"
+                {...register('riskRating', { required: 'Classificação de risco é obrigatório' })}
+                className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-300 focus:ring-primary/20"
+              >
+                <option value="service" disabled selected>
+                  Selecione a classificação
+                </option>
+                <option value="eletivo">Eletivo</option>
+                <option value="prioritário">Prioritário</option>
+                <option value="urgente">Urgente</option>
+              </select>
+              {errors.riskRating && (
+                <p className="text-sm text-destructive">{errors.riskRating.message}</p>
+              )}
+          </div>
           </div>
 
           <div className="space-y-2">
@@ -215,3 +312,9 @@ export const PatientForm: React.FC<PatientFormProps> = ({ onSubmit, onCancel }) 
     </Card>
   );
 };
+
+/*
+campos faltantes:
+atendimento(ambulatorial ou domicilar)
+classificação de risco(eletivo, prioriatario ou urgente)
+ */
