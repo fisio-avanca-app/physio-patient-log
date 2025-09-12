@@ -20,10 +20,10 @@ Todas as cores DEVEM ser HSL para compatibilidade.
     --popover: 0 0% 100%;
     --popover-foreground: 215 25% 27%;
 
-    /* Primary: azul profissional para fisioterapia */
-    --primary: 200 95% 45%;
+    /* Primary: tom bege/marrom claro profissional */
+    --primary: 30 19% 68%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 200 85% 55%;
+    --primary-glow: 30 25% 75%;
 
     /* Secondary: verde suave para saúde */
     --secondary: 150 30% 94%;
