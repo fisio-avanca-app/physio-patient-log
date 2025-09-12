@@ -30,7 +30,7 @@ export const PatientCard: React.FC<PatientCardProps> = ({ patient, onView, onDel
               <p className="text-sm text-muted-foreground">{patient.age} anos</p>
             </div>
           </div>
-          <Badge variant="secondary" className="bg-accent/10 text-accent-foreground">
+          <Badge variant="default" className="bg-primary text-primary-foreground font-semibold">
             {evolutionsCount} evolução{evolutionsCount !== 1 ? 'ões' : ''}
           </Badge>
         </div>
