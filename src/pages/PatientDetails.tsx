@@ -55,11 +55,15 @@ export const PatientDetails: React.FC = () => {
   }
 
   const handleAddEvolution = (data: { date: string; description: string }) => {
-    if (!id) return;
+    if (!id) 
+      return;
     
+  const [year, month, day] = data.date.split('-').map(Number);
+  const localDate = new Date(year, month - 1, day);
+
     const evolutionData: CreateEvolutionData = {
       patientId: id,
-      date: new Date(data.date),
+      date: localDate,
       description: data.description
     };
 
@@ -98,9 +102,12 @@ export const PatientDetails: React.FC = () => {
     // Como não temos método updateEvolution no hook, vamos deletar e recriar
     deleteEvolution(editingEvolution.id);
     
+  const [year, month, day] = data.date.split('-').map(Number);
+  const localDate = new Date(year, month - 1, day);
+
     const evolutionData: CreateEvolutionData = {
       patientId: editingEvolution.patientId,
-      date: new Date(data.date),
+      date: localDate,
       description: data.description
     };
 

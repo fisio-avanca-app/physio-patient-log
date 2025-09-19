@@ -50,7 +50,8 @@ export const useFirebaseEvolutions = () => {
 
   // Adiciona nova evolução
   const addEvolution = async (evolutionData: CreateEvolutionData): Promise<Evolution> => {
-    if (!user) throw new Error('Usuário não autenticado');
+    if (!user) 
+      throw new Error('Usuário não autenticado');
 
     const newEvolutionData = {
       ...evolutionData,
