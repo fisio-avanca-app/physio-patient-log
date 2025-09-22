@@ -15,6 +15,7 @@ import { useForm } from 'react-hook-form';
 import { CreateEvolutionData, Patient, Evolution } from '@/types/patient';
 import { useToast } from '@/hooks/use-toast';
 
+
 export const PatientDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -24,6 +25,8 @@ export const PatientDetails: React.FC = () => {
   const [showEvolutionForm, setShowEvolutionForm] = useState(false);
   const [showEditPatientForm, setShowEditPatientForm] = useState(false);
   const [editingEvolution, setEditingEvolution] = useState<Evolution | null>(null);
+  const [evolutionIdToDelete, setEvolutionIdToDelete] = useState<string | null>(null);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   const patient = id ? getPatientById(id) : null;
   const evolutions = id ? getEvolutionsByPatient(id) : [];
@@ -76,12 +79,23 @@ export const PatientDetails: React.FC = () => {
     });
   };
 
-  const handleDeleteEvolution = (evolutionId: string) => {
-    deleteEvolution(evolutionId);
+  const openDeleteConfirmation = (id: string) => {
+    setEvolutionIdToDelete(id);
+    setIsConfirmOpen(true);
+  };
+
+  const handleDeleteEvolution = () => {
+     if (!evolutionIdToDelete)
+       return;
+    
+    deleteEvolution(evolutionIdToDelete);
     toast({
       title: "Evolução removida",
       description: "A evolução foi removida com sucesso!",
     });
+    
+    setIsConfirmOpen(false);
+    setEvolutionIdToDelete(null);
   };
 
   const handleUpdatePatient = (data: Partial<Patient>) => {
@@ -344,7 +358,7 @@ export const PatientDetails: React.FC = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleDeleteEvolution(evolution.id)}
+                          onClick={() => openDeleteConfirmation(evolution.id)}
                           className="border-destructive/50 text-destructive hover:bg-destructive hover:text-destructive-foreground"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -696,6 +710,30 @@ export const PatientDetails: React.FC = () => {
             </form>
           </DialogContent>
         </Dialog>
+
+        {/* Modal de confirmação de exclusão da evolução */} 
+        {isConfirmOpen && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+            <div className="bg-white rounded p-6 max-w-sm shadow-lg">
+              <h2 className="text-lg font-semibold mb-4">Confirmar exclusão</h2>
+              <p className="mb-6">Tem certeza que deseja excluir esta evolução? Essa ação não pode ser desfeita.</p>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setIsConfirmOpen(false)}
+                  className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                >
+                  Cancelar
+                </button>
+                <button
+                onClick={handleDeleteEvolution} 
+                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                >
+                  Excluir
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   );
