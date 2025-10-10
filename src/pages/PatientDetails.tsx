@@ -222,7 +222,7 @@ export const PatientDetails: React.FC = () => {
 
               <div className="space-y-1">
                 <p className="text-sm font-medium text-muted-foreground">Peso</p>
-                <p className="text-lg font-semibold text-foreground">{patient.weight} quilos</p>
+                <p className="text-lg font-semibold text-foreground">{patient.weight} Kg</p>
               </div>
 
               <div className="space-y-1">
