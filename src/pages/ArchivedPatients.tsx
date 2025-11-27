@@ -35,8 +35,8 @@ export const ArchivedPatients: React.FC = () => {
     });
   };
 
-  const handleDeletePatient = (patient: Patient) => {
-    deletePatient(patient.id);
+  const handleDeletePatient = async (patient: Patient) => {
+    await deletePatient(patient.id);
     setDeleteDialog(null);
     toast({
       title: "Paciente removido",
