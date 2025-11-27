@@ -19,6 +19,7 @@ export interface Patient {
   referencePoint: string,
   service: string,
   riskRating: string,
+  archived?: boolean,
 }
 
 export interface Evolution {

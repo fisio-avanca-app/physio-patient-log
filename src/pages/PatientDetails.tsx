@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { useFirebasePatients } from '@/hooks/useFirebasePatients';
 import { useFirebaseEvolutions } from '@/hooks/useFirebaseEvolutions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Plus, Calendar, FileText, Phone, Mail, User, Trash2, Edit, Save, X } from 'lucide-react';
+import { ArrowLeft, Plus, Calendar, FileText, Phone, Mail, User, Trash2, Edit, Save, X, Archive, ArchiveRestore } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { CreateEvolutionData, Patient, Evolution } from '@/types/patient';
 import { useToast } from '@/hooks/use-toast';
@@ -19,7 +19,7 @@ import { useToast } from '@/hooks/use-toast';
 export const PatientDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getPatientById, updatePatient } = useFirebasePatients();
+  const { getPatientById, updatePatient, archivePatient, unarchivePatient } = useFirebasePatients();
   const { getEvolutionsByPatient, addEvolution, deleteEvolution } = useFirebaseEvolutions();
   const { toast } = useToast();
   const [showEvolutionForm, setShowEvolutionForm] = useState(false);
@@ -27,9 +27,27 @@ export const PatientDetails: React.FC = () => {
   const [editingEvolution, setEditingEvolution] = useState<Evolution | null>(null);
   const [evolutionIdToDelete, setEvolutionIdToDelete] = useState<string | null>(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [archiveDialog, setArchiveDialog] = useState(false);
+  const [patient, setPatient] = useState<Patient | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const patient = id ? getPatientById(id) : null;
   const evolutions = id ? getEvolutionsByPatient(id) : [];
+
+  // Carrega o paciente (pode ser arquivado)
+  useEffect(() => {
+    if (!id) {
+      setLoading(false);
+      return;
+    }
+
+    const loadPatient = async () => {
+      const patientData = await getPatientById(id);
+      setPatient(patientData || null);
+      setLoading(false);
+    };
+
+    loadPatient();
+  }, [id, getPatientById]);
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<{
     date: string;
@@ -42,6 +60,19 @@ export const PatientDetails: React.FC = () => {
     date: string;
     description: string;
   }>();
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-4 text-muted-foreground">Carregando...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   if (!patient) {
     return (
@@ -168,6 +199,27 @@ export const PatientDetails: React.FC = () => {
   return `${day}/${month}/${year}`;
 };
 
+  const handleArchivePatient = async () => {
+    if (!id) return;
+    
+    if (patient?.archived) {
+      await unarchivePatient(id);
+      toast({
+        title: "Paciente desarquivado",
+        description: `${patient.name} foi movido de volta para a lista ativa.`,
+      });
+    } else {
+      await archivePatient(id);
+      toast({
+        title: "Paciente arquivado",
+        description: `${patient.name} foi movido para pacientes arquivados.`,
+      });
+    }
+    
+    setArchiveDialog(false);
+    navigate('/');
+  };
+
   return (
     <Layout>
       <div className="space-y-6">
@@ -179,6 +231,26 @@ export const PatientDetails: React.FC = () => {
           </Button>
           
           <div className="flex space-x-3">
+            <Button 
+              onClick={() => setArchiveDialog(true)}
+              variant="outline"
+              className={patient?.archived 
+                ? "border-primary text-primary hover:bg-primary hover:text-primary-foreground" 
+                : "border-muted-foreground text-muted-foreground hover:bg-muted"
+              }
+            >
+              {patient?.archived ? (
+                <>
+                  <ArchiveRestore className="h-4 w-4 mr-2" />
+                  Desarquivar
+                </>
+              ) : (
+                <>
+                  <Archive className="h-4 w-4 mr-2" />
+                  Arquivar
+                </>
+              )}
+            </Button>
             <Button 
               onClick={openEditPatient}
               variant="outline"
@@ -711,7 +783,44 @@ export const PatientDetails: React.FC = () => {
           </DialogContent>
         </Dialog>
 
-        {/* Modal de confirmação de exclusão da evolução */} 
+        {/* Modal de confirmação de arquivamento */}
+        <Dialog open={archiveDialog} onOpenChange={setArchiveDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{patient?.archived ? 'Desarquivar' : 'Arquivar'} Paciente</DialogTitle>
+              <DialogDescription>
+                {patient?.archived ? (
+                  <>
+                    Tem certeza que deseja desarquivar <strong>{patient.name}</strong>?
+                    O paciente voltará para a lista de pacientes ativos.
+                  </>
+                ) : (
+                  <>
+                    Tem certeza que deseja arquivar <strong>{patient?.name}</strong>?
+                    O paciente será movido para a lista de pacientes arquivados e não aparecerá mais na lista principal.
+                  </>
+                )}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex space-x-3 mt-6">
+              <Button 
+                onClick={handleArchivePatient}
+                className="flex-1 bg-gradient-primary hover:opacity-90"
+              >
+                {patient?.archived ? 'Desarquivar' : 'Arquivar'}
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => setArchiveDialog(false)}
+                className="flex-1"
+              >
+                Cancelar
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Modal de confirmação de exclusão da evolução */}
         {isConfirmOpen && (
           <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
             <div className="bg-white rounded p-6 max-w-sm shadow-lg">

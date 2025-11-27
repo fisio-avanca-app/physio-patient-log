@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from "@/contexts/FirebaseAuthContext";
 import { Login } from "@/pages/Login";
 import { Home } from "@/pages/Home";
 import { PatientDetails } from "@/pages/PatientDetails";
+import { ArchivedPatients } from "@/pages/ArchivedPatients";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const AppContent = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/patient/:id" element={<PatientDetails />} />
+        <Route path="/archived" element={<ArchivedPatients />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
