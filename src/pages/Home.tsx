@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Plus, Search, Users, Calendar, TrendingUp } from 'lucide-react';
+import { Plus, Search, Users, Calendar, TrendingUp, Archive } from 'lucide-react';
 import { Patient, CreatePatientData } from '@/types/patient';
 import { useFirebaseEvolutions } from '@/hooks/useFirebaseEvolutions';
 import { useToast } from '@/hooks/use-toast';
@@ -132,13 +132,24 @@ export const Home: React.FC = () => {
             />
           </div>
           
-          <Button 
-            onClick={() => setShowForm(true)}
-            className="bg-gradient-primary hover:opacity-90 flex items-center space-x-2"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Novo Paciente</span>
-          </Button>
+          <div className="flex gap-3">
+            <Button 
+              onClick={() => navigate('/archived')}
+              variant="outline"
+              className="border-primary text-primary hover:bg-primary hover:text-primary-foreground flex items-center space-x-2"
+            >
+              <Archive className="h-4 w-4" />
+              <span>Arquivados</span>
+            </Button>
+            
+            <Button 
+              onClick={() => setShowForm(true)}
+              className="bg-gradient-primary hover:opacity-90 flex items-center space-x-2"
+            >
+              <Plus className="h-4 w-4" />
+              <span>Novo Paciente</span>
+            </Button>
+          </div>
         </div>
 
         {/* Lista de pacientes */}
