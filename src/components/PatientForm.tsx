@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserPlus } from 'lucide-react';
+import { useFirebaseSourceUnits } from '@/hooks/useFirebaseSourceUnits';
 
 interface PatientFormProps {
   onSubmit: (data: CreatePatientData) => void;
@@ -15,6 +16,7 @@ interface PatientFormProps {
 
 export const PatientForm: React.FC<PatientFormProps> = ({ onSubmit, onCancel }) => {
   const { register, handleSubmit, formState: { errors }, reset } = useForm<CreatePatientData>();
+  const { sourceUnits } = useFirebaseSourceUnits();
 
   const handleFormSubmit = (data: CreatePatientData) => {
     onSubmit(data);
@@ -167,14 +169,17 @@ export const PatientForm: React.FC<PatientFormProps> = ({ onSubmit, onCancel }) 
 
             <div className="space-y-2">
               <Label htmlFor="sourceUnit">Unidade de Origem *</Label>
-              <Input
+              <select
                 id="sourceUnit"
-                type="sourceUnit"
                 {...register('sourceUnit', { required: 'Unidade de Origem é obrigatório' })}
-                placeholder="Unidade de Origem"
-                className="transition-all duration-300 focus:ring-2 focus:ring-primary/20"
-              />
-                {errors.sourceUnit && (
+                className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-300 focus:ring-primary/20"
+              >
+                <option value="" disabled selected>Selecione a unidade</option>
+                {sourceUnits.map((unit) => (
+                  <option key={unit.id} value={unit.name}>{unit.name}</option>
+                ))}
+              </select>
+              {errors.sourceUnit && (
                 <p className="text-sm text-destructive">{errors.sourceUnit.message}</p>
               )}
             </div>
