@@ -1,53 +1,44 @@
 import React, { useState } from 'react';
 import { Layout } from '@/components/Layout';
-import { PatientCard } from '@/components/PatientCard';
 import { PatientForm } from '@/components/PatientForm';
 import { useFirebasePatients } from '@/hooks/useFirebasePatients';
 import { useFirebaseSourceUnits } from '@/hooks/useFirebaseSourceUnits';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Plus, Search, Users, Calendar, TrendingUp, Archive, Building2 } from 'lucide-react';
-import { Patient, CreatePatientData } from '@/types/patient';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Plus, Users, Calendar, TrendingUp, Archive, Building2 } from 'lucide-react';
+import { CreatePatientData } from '@/types/patient';
 import { useFirebaseEvolutions } from '@/hooks/useFirebaseEvolutions';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 
 export const Home: React.FC = () => {
-  const { patients, loading, addPatient, deletePatient } = useFirebasePatients();
+  const { patients, loading, addPatient } = useFirebasePatients();
   const { sourceUnits } = useFirebaseSourceUnits();
   const { evolutions } = useFirebaseEvolutions();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [deleteDialog, setDeleteDialog] = useState<Patient | null>(null);
 
-  const filteredPatients = patients.filter(patient =>
-    patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.diagnosis.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Contar pacientes por unidade
+  const unitCounts: Record<string, number> = {};
+  patients.forEach(p => {
+    const unit = p.sourceUnit || 'Sem unidade';
+    unitCounts[unit] = (unitCounts[unit] || 0) + 1;
+  });
 
-  // Agrupar pacientes por unidade de origem
-  const groupedPatients = filteredPatients.reduce<Record<string, Patient[]>>((acc, patient) => {
-    const unit = patient.sourceUnit || 'Sem unidade';
-    if (!acc[unit]) acc[unit] = [];
-    acc[unit].push(patient);
-    return acc;
-  }, {});
+  // Montar lista de unidades (cadastradas + "Sem unidade" se houver)
+  const unitCards = sourceUnits.map(u => ({
+    name: u.name,
+    count: unitCounts[u.name] || 0,
+  }));
 
-  // Ordenar: primeiro as unidades cadastradas, depois "Sem unidade"
-  const unitNames = sourceUnits.map(u => u.name);
-  const sortedGroups = Object.keys(groupedPatients).sort((a, b) => {
-    if (a === 'Sem unidade') return 1;
-    if (b === 'Sem unidade') return -1;
-    const idxA = unitNames.indexOf(a);
-    const idxB = unitNames.indexOf(b);
-    if (idxA === -1 && idxB === -1) return a.localeCompare(b);
-    if (idxA === -1) return 1;
-    if (idxB === -1) return -1;
-    return idxA - idxB;
+  // Adicionar unidades não cadastradas que têm pacientes (retrocompatibilidade)
+  const registeredNames = new Set(sourceUnits.map(u => u.name));
+  Object.keys(unitCounts).forEach(name => {
+    if (!registeredNames.has(name)) {
+      unitCards.push({ name, count: unitCounts[name] });
+    }
   });
 
   const handleAddPatient = (data: CreatePatientData) => {
@@ -57,19 +48,6 @@ export const Home: React.FC = () => {
       title: "Paciente cadastrado",
       description: `${data.name} foi adicionado com sucesso!`,
     });
-  };
-
-  const handleDeletePatient = (patient: Patient) => {
-    deletePatient(patient.id);
-    setDeleteDialog(null);
-    toast({
-      title: "Paciente removido",
-      description: `${patient.name} foi removido do sistema.`,
-    });
-  };
-
-  const handleViewPatient = (patient: Patient) => {
-    navigate(`/patient/${patient.id}`);
   };
 
   const totalPatients = patients.length;
@@ -96,7 +74,7 @@ export const Home: React.FC = () => {
   return (
     <Layout>
       <div className="space-y-8">
-        {/* Header com estatísticas */}
+        {/* Estatísticas */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="bg-gradient-card shadow-card">
             <CardContent className="p-6">
@@ -141,95 +119,71 @@ export const Home: React.FC = () => {
           </Card>
         </div>
 
-        {/* Ações e busca */}
-        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Buscar pacientes..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          
-          <div className="flex gap-3">
-            <Button 
-              onClick={() => navigate('/source-units')}
-              variant="outline"
-              className="border-primary text-primary hover:bg-primary hover:text-primary-foreground flex items-center space-x-2"
-            >
-              <Building2 className="h-4 w-4" />
-              <span>Unidades</span>
-            </Button>
-            <Button 
-              onClick={() => navigate('/archived')}
-              variant="outline"
-              className="border-primary text-primary hover:bg-primary hover:text-primary-foreground flex items-center space-x-2"
-            >
-              <Archive className="h-4 w-4" />
-              <span>Arquivados</span>
-            </Button>
-            <Button 
-              onClick={() => setShowForm(true)}
-              className="bg-gradient-primary hover:opacity-90 flex items-center space-x-2"
-            >
-              <Plus className="h-4 w-4" />
-              <span>Novo Paciente</span>
-            </Button>
-          </div>
+        {/* Ações */}
+        <div className="flex flex-wrap gap-3 justify-end">
+          <Button 
+            onClick={() => navigate('/source-units')}
+            variant="outline"
+            className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+          >
+            <Building2 className="h-4 w-4 mr-2" />
+            Unidades
+          </Button>
+          <Button 
+            onClick={() => navigate('/archived')}
+            variant="outline"
+            className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+          >
+            <Archive className="h-4 w-4 mr-2" />
+            Arquivados
+          </Button>
+          <Button 
+            onClick={() => setShowForm(true)}
+            className="bg-gradient-primary hover:opacity-90"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Novo Paciente
+          </Button>
         </div>
 
-        {/* Lista de pacientes agrupada por Unidade de Origem */}
+        {/* Cards de unidades */}
         <div>
-          <h2 className="text-2xl font-bold text-foreground mb-6">
-            Pacientes {searchTerm && `(${filteredPatients.length} encontrado${filteredPatients.length !== 1 ? 's' : ''})`}
-          </h2>
-          
-          {filteredPatients.length === 0 ? (
+          <h2 className="text-2xl font-bold text-foreground mb-6">Unidades de Origem</h2>
+
+          {unitCards.length === 0 ? (
             <Card className="shadow-card">
               <CardContent className="p-12 text-center">
-                <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-foreground mb-2">
-                  {searchTerm ? 'Nenhum paciente encontrado' : 'Nenhum paciente cadastrado'}
-                </h3>
-                <p className="text-muted-foreground mb-6">
-                  {searchTerm 
-                    ? 'Tente ajustar sua busca ou cadastre um novo paciente.'
-                    : 'Comece cadastrando seu primeiro paciente para organizar os atendimentos.'
-                  }
-                </p>
-                {!searchTerm && (
-                  <Button 
-                    onClick={() => setShowForm(true)}
-                    className="bg-gradient-primary hover:opacity-90"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Cadastrar Primeiro Paciente
-                  </Button>
-                )}
+                <Building2 className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-foreground mb-2">Nenhuma unidade cadastrada</h3>
+                <p className="text-muted-foreground mb-6">Cadastre unidades de origem para organizar seus pacientes.</p>
+                <Button onClick={() => navigate('/source-units')} className="bg-gradient-primary hover:opacity-90">
+                  <Building2 className="h-4 w-4 mr-2" />
+                  Gerenciar Unidades
+                </Button>
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-8">
-              {sortedGroups.map((unitName) => (
-                <div key={unitName}>
-                  <div className="flex items-center gap-2 mb-4">
-                    <Building2 className="h-5 w-5 text-primary" />
-                    <h3 className="text-xl font-semibold text-foreground">{unitName}</h3>
-                    <span className="text-sm text-muted-foreground">({groupedPatients[unitName].length})</span>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {groupedPatients[unitName].map((patient) => (
-                      <PatientCard
-                        key={patient.id}
-                        patient={patient}
-                        onView={handleViewPatient}
-                        onDelete={setDeleteDialog}
-                      />
-                    ))}
-                  </div>
-                </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {unitCards.map((unit) => (
+                <Card
+                  key={unit.name}
+                  className="shadow-card hover:shadow-soft transition-all duration-300 hover:scale-[1.02] cursor-pointer"
+                  onClick={() => navigate(`/unit/${encodeURIComponent(unit.name)}`)}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-primary/10 rounded-full p-3">
+                          <Building2 className="h-6 w-6 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-foreground">🏥 {unit.name}</h3>
+                        </div>
+                      </div>
+                      <span className="text-2xl font-bold text-primary">({unit.count})</span>
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           )}
@@ -242,35 +196,6 @@ export const Home: React.FC = () => {
               onSubmit={handleAddPatient}
               onCancel={() => setShowForm(false)}
             />
-          </DialogContent>
-        </Dialog>
-
-        {/* Modal de confirmação de exclusão */}
-        <Dialog open={!!deleteDialog} onOpenChange={() => setDeleteDialog(null)}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Confirmar Exclusão</DialogTitle>
-              <DialogDescription>
-                Tem certeza que deseja excluir o paciente <strong>{deleteDialog?.name}</strong>?
-                Todas as evoluções relacionadas também serão removidas. Esta ação não pode ser desfeita.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex space-x-3 mt-6">
-              <Button 
-                variant="destructive" 
-                onClick={() => deleteDialog && handleDeletePatient(deleteDialog)}
-                className="flex-1"
-              >
-                Excluir
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => setDeleteDialog(null)}
-                className="flex-1"
-              >
-                Cancelar
-              </Button>
-            </div>
           </DialogContent>
         </Dialog>
       </div>
