@@ -3,18 +3,20 @@ import { Layout } from '@/components/Layout';
 import { PatientCard } from '@/components/PatientCard';
 import { PatientForm } from '@/components/PatientForm';
 import { useFirebasePatients } from '@/hooks/useFirebasePatients';
+import { useFirebaseSourceUnits } from '@/hooks/useFirebaseSourceUnits';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Plus, Search, Users, Calendar, TrendingUp, Archive } from 'lucide-react';
+import { Plus, Search, Users, Calendar, TrendingUp, Archive, Building2 } from 'lucide-react';
 import { Patient, CreatePatientData } from '@/types/patient';
 import { useFirebaseEvolutions } from '@/hooks/useFirebaseEvolutions';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+
 export const Home: React.FC = () => {
   const { patients, loading, addPatient, deletePatient } = useFirebasePatients();
+  const { sourceUnits } = useFirebaseSourceUnits();
   const { evolutions } = useFirebaseEvolutions();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -26,6 +28,27 @@ export const Home: React.FC = () => {
     patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     patient.diagnosis.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Agrupar pacientes por unidade de origem
+  const groupedPatients = filteredPatients.reduce<Record<string, Patient[]>>((acc, patient) => {
+    const unit = patient.sourceUnit || 'Sem unidade';
+    if (!acc[unit]) acc[unit] = [];
+    acc[unit].push(patient);
+    return acc;
+  }, {});
+
+  // Ordenar: primeiro as unidades cadastradas, depois "Sem unidade"
+  const unitNames = sourceUnits.map(u => u.name);
+  const sortedGroups = Object.keys(groupedPatients).sort((a, b) => {
+    if (a === 'Sem unidade') return 1;
+    if (b === 'Sem unidade') return -1;
+    const idxA = unitNames.indexOf(a);
+    const idxB = unitNames.indexOf(b);
+    if (idxA === -1 && idxB === -1) return a.localeCompare(b);
+    if (idxA === -1) return 1;
+    if (idxB === -1) return -1;
+    return idxA - idxB;
+  });
 
   const handleAddPatient = (data: CreatePatientData) => {
     addPatient(data);
@@ -46,11 +69,9 @@ export const Home: React.FC = () => {
   };
 
   const handleViewPatient = (patient: Patient) => {
-    // Navegar para página de detalhes do paciente
     navigate(`/patient/${patient.id}`);
   };
 
-  // Estatísticas
   const totalPatients = patients.length;
   const totalEvolutions = evolutions.length;
   const thisMonth = new Date().getMonth();
@@ -134,6 +155,14 @@ export const Home: React.FC = () => {
           
           <div className="flex gap-3">
             <Button 
+              onClick={() => navigate('/source-units')}
+              variant="outline"
+              className="border-primary text-primary hover:bg-primary hover:text-primary-foreground flex items-center space-x-2"
+            >
+              <Building2 className="h-4 w-4" />
+              <span>Unidades</span>
+            </Button>
+            <Button 
               onClick={() => navigate('/archived')}
               variant="outline"
               className="border-primary text-primary hover:bg-primary hover:text-primary-foreground flex items-center space-x-2"
@@ -141,7 +170,6 @@ export const Home: React.FC = () => {
               <Archive className="h-4 w-4" />
               <span>Arquivados</span>
             </Button>
-            
             <Button 
               onClick={() => setShowForm(true)}
               className="bg-gradient-primary hover:opacity-90 flex items-center space-x-2"
@@ -152,7 +180,7 @@ export const Home: React.FC = () => {
           </div>
         </div>
 
-        {/* Lista de pacientes */}
+        {/* Lista de pacientes agrupada por Unidade de Origem */}
         <div>
           <h2 className="text-2xl font-bold text-foreground mb-6">
             Pacientes {searchTerm && `(${filteredPatients.length} encontrado${filteredPatients.length !== 1 ? 's' : ''})`}
@@ -183,14 +211,25 @@ export const Home: React.FC = () => {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredPatients.map((patient) => (
-                <PatientCard
-                  key={patient.id}
-                  patient={patient}
-                  onView={handleViewPatient}
-                  onDelete={setDeleteDialog}
-                />
+            <div className="space-y-8">
+              {sortedGroups.map((unitName) => (
+                <div key={unitName}>
+                  <div className="flex items-center gap-2 mb-4">
+                    <Building2 className="h-5 w-5 text-primary" />
+                    <h3 className="text-xl font-semibold text-foreground">{unitName}</h3>
+                    <span className="text-sm text-muted-foreground">({groupedPatients[unitName].length})</span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {groupedPatients[unitName].map((patient) => (
+                      <PatientCard
+                        key={patient.id}
+                        patient={patient}
+                        onView={handleViewPatient}
+                        onDelete={setDeleteDialog}
+                      />
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           )}

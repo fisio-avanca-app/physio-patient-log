@@ -8,6 +8,7 @@ import { Login } from "@/pages/Login";
 import { Home } from "@/pages/Home";
 import { PatientDetails } from "@/pages/PatientDetails";
 import { ArchivedPatients } from "@/pages/ArchivedPatients";
+import { SourceUnits } from "@/pages/SourceUnits";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const AppContent = () => {
         <Route path="/" element={<Home />} />
         <Route path="/patient/:id" element={<PatientDetails />} />
         <Route path="/archived" element={<ArchivedPatients />} />
+        <Route path="/source-units" element={<SourceUnits />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
