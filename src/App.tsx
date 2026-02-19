@@ -9,6 +9,7 @@ import { Home } from "@/pages/Home";
 import { PatientDetails } from "@/pages/PatientDetails";
 import { ArchivedPatients } from "@/pages/ArchivedPatients";
 import { SourceUnits } from "@/pages/SourceUnits";
+import { UnitPatients } from "@/pages/UnitPatients";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const AppContent = () => {
         <Route path="/patient/:id" element={<PatientDetails />} />
         <Route path="/archived" element={<ArchivedPatients />} />
         <Route path="/source-units" element={<SourceUnits />} />
+        <Route path="/unit/:unitName" element={<UnitPatients />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
